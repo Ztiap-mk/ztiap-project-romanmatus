@@ -47,50 +47,7 @@ var images = {};
 });
 */
 
-class Bird {
-  // Initialization
-  constructor() {
-      this.canvas = document.getElementById("canvas");
-      this.image = resourceManager.getImageSource('bird');
-  
-      this.x = 180;
-      this.y = canvas.height/2;
 
-  }
-
-  // Movement logic
-  move(dt) {
-      const canvas = this.canvas;
-      if (this.x > canvas.width) {
-          this.x = canvas.width
-          this.dx = -Math.abs(this.dx)
-      }
-      if (this.x < 0) {
-          this.x = 0
-          this.dx = Math.abs(this.dx)
-      }
-      if (this.y > canvas.height) {
-          this.y = canvas.height
-          this.dy = -Math.abs(this.dy)
-      }
-      if (this.y < 0) {
-          this.y = 0
-          this.dy = Math.abs(this.dy) * 0.95
-      }
-  
-      // Movement
-      this.x += this.dx * dt
-      this.y += 0 * dt
-      this.rotation +=dt/3
-      }
-    
-      draw(ctx){
-        ctx.save()
-        ctx.drawImage(this.image, 0, 0)
-        ctx.restore()
-        }
-    
-}
 
 class ResourceManager {
   loadedImages = new Map();
@@ -208,6 +165,106 @@ class Game {
         
     }
 }
+
+
+class Bird {
+    // Initialization
+    constructor() {
+        this.canvas = document.getElementById("canvas");
+        this.image = resourceManager.getImageSource('bird');
+    
+        this.x = 180;
+        this.y = canvas.height/2;
+        this.gravity = 0.6;
+        this.lift = -15;
+        this.velocity = 0;
+      }
+    
+      
+    
+      up()
+      {
+          this.velocity += this.lift;
+      }
+    
+      update()
+      {
+        this.velocity += this.gravity;
+        this.velocity *= 0.9;
+        this.y += this.velocity;
+    
+        if (this.y > height) {
+          this.y = height;
+          this.velocity = 0;
+        }
+    
+        if (this.y < 0) {
+          this.y = 0;
+          this.velocity = 0;
+        }
+      }
+    
+        draw(ctx){
+          ctx.save()
+          ctx.drawImage(this.image, 0, 0)
+          ctx.restore()
+          }
+      
+  }
+  
+  class Pipe
+  {
+    constructor()
+    {
+        this.canvas = document.getElementById("canvas");
+        this.image = resourceManager.getImageSource('pipe');
+
+      this.spacing = 100;
+      this.top = random(100, 400)
+      this.bottom = this.top + this.spacing;
+  
+      this.x = width;
+      this.w = 20;
+      this.speed = 2;
+  
+      this.highlight = false;
+    }
+  
+    hits()
+    {
+      if (bird.y < this.top || bird.y > this.bottom) {
+        if (bird.x > this.x && bird.x < this.x + this.w) {
+          this.highlight = true;
+          return true;
+        }
+      }
+      this.highlight = false;
+      return false;
+    }
+  
+    show()
+    {
+        ctx.save()
+        ctx.drawImage(this.image, this.x, 0, this.w, this.top)
+        ctx.drawImage(this.image, this.x, height - this.bottom, this.w, this.bottom)
+        ctx.restore()
+    }
+  
+    update()
+    {
+      this.x -= this.speed;
+    }
+  
+    offscreen()
+    {
+      if (this.x < -this.w) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  
+  }
 
 
 
